@@ -137,3 +137,21 @@
 
 </body>
 </html>
+<style>
+  table {
+    table-layout: auto; /* ya fixed, depending on requirement */
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  th, td {
+    padding: 8px;  /* kam padding rakho */
+    text-align: center;
+  }
+
+  /* Stock Name column ka width fix karo */
+  td:first-child, th:first-child {
+    width: 150px; /* apne hisaab se badal sakte ho */
+    white-space: nowrap; /* text ko break hone se roke */
+  }
+</style>
