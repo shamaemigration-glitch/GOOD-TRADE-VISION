@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GOOD TRADE VISION - Stock Updates</title>
+<style>
+    body { font-family: Arial, sans-serif; text-align: center; background: #f9f9f9; margin: 0; }
+    h1 { background: #2c3e50; color: white; padding: 15px; margin: 0; }
+    .buttons { margin: 15px; }
+    .buttons a {
+        text-decoration: none; padding: 10px 15px; margin: 5px;
+        border-radius: 5px; color: white; display: inline-block;
+    }
+    .telegram { background: #0088cc; }
+    .whatsapp { background: #25d366; }
+    .youtube { background: #ff0000; }
+    input { padding: 8px; width: 80%; margin: 10px; font-size: 16px; }
+    table { width: 95%; margin: auto; border-collapse: collapse; background: white; }
+    th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }
+    th { background: #2c3e50; color: white; }
+    tr:nth-child(even) { background: #f2f2f2; }
+    @media (max-width:600px) {
+        input { width: 95%; }
+        table, thead, tbody, th, td, tr { display: block; }
+        thead tr { display: none; }
+        tr { margin-bottom: 10px; border: 1px solid #ddd; padding: 8px; }
+        td { text-align: right; padding-left: 50%; position: relative; }
+        td::before {
+            content: attr(data-label);
+            position: absolute;
+            left: 10px;
+            width: 45%;
+            text-align: left;
+            font-weight: bold;
+        }
+    }
+</style>
+</head>
+<body>
+
+<h1>GOOD TRADE VISION</h1>
+
+<div class="buttons">
+    <a class="telegram" href="https://t.me/Goodtradevision" target="_blank">Join Telegram</a>
+    <a class="whatsapp" href="https://wa.me/919838402377" target="_blank">Join WhatsApp</a>
+    <a class="youtube" href="https://www.youtube.com/@GOODTRADEVISION" target="_blank">YouTube Channel</a>
+</div>
+
+<input type="text" id="searchBox" onkeyup="searchTable()" placeholder="Search for stocks...">
+
+<table id="stockTable" aria-live="polite">
+    <thead>
+        <tr>
+            <th>Stock Name</th>
+            <th>Buy Date</th>
+            <th>Buy Price</th>
+            <th>Posted Date</th>
+            <th>Posted Time</th>
+        </tr>
+    </thead>
+    <tbody id="tableBody">
+        <tr><td colspan="5">Loading data...</td></tr>
+    </tbody>
+</table>
+
+<script>
+// Google Sheet CSV Link (published)
+// Replace with your published CSV link if different
+const sheetURL = "https://docs.google.com/spreadsheets/d/1hZt09JifEOuHTxrRwgCDKbfvW0sCLgLTAZQdGsRJ4rg/export?format=csv";
+
+function parseCSV(text) {
+    const rows = [];
+    let current = '';
+    let row = [];
+    let inQuotes = false;
+    for (let i = 0; i < text.length; i++) {
+        const ch = text[i];
+        if (ch === '"' ) {
+            inQuotes = !inQuotes;
+            continue;
+        }
+        if (ch === ',' && !inQuotes) {
+            row.push(current);
+            current = '';
+            continue;
+        }
+        if ((ch === '\n' || ch === '\r') && !inQuotes) {
+            if (current !== '' || row.length > 0) {
+                row.push(current);
+                rows.push(row);
+                row = [];
+                current = '';
+            }
+            // handle CRLF
+            if (ch === '\r' && text[i+1] === '\n') i++;
+            continue;
+        }
+        current += ch;
+    }
+    if (current !== '' || row.length > 0) {
+        row.push(current);
+        rows.push(row);
+    }
+    return rows;
+}
+
+async function loadData() {
+    try {
+        const res = await fetch(sheetURL);
+        if (!res.ok) throw new Error('Network response was not ok');
+        const csv = await res.text();
+        const rows = parseCSV(csv);
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = '';
+        // find header row in sheet (assume first row is header)
+        const dataRows = rows.slice(1);
+        if (dataRows.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5">No data found in sheet.</td></tr>';
+            return;
+        }
+        dataRows.forEach(r => {
+            // ensure at least 4 columns; fill missing with empty strings
+            while (r.length < 5) r.push('');
+            const tr = document.createElement('tr');
+            const cells = [
+                {label:'Stock Name', value: r[0]},
+                {label:'Buy Date', value: r[1]},
+                {label:'Buy Price', value: r[2]},
+                {label:'Posted Date', value: r[3]},
+                {label:'Posted Time', value: r[4]}
+            ];
+            cells.forEach(c => {
+                const td = document.createElement('td');
+                td.setAttribute('data-label', c.label);
+                td.textContent = c.value;
+                tr.appendChild(td);
+            });
+            tbody.appendChild(tr);
+        });
+    } catch (err) {
+        document.getElementById('tableBody').innerHTML = '<tr><td colspan="5">Error loading data: ' + err.message + '</td></tr>';
+    }
+}
+
+function searchTable() {
+    const q = document.getElementById('searchBox').value.toLowerCase().trim();
+    const rows = document.querySelectorAll('#stockTable tbody tr');
+    rows.forEach(row => {
+        row.style.display = row.innerText.toLowerCase().includes(q) ? '' : 'none';
+    });
+}
+
+loadData();
+// refresh data every 2 minutes
+setInterval(loadData, 120000);
+</script>
+
+</body>
+</html>
