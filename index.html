@@ -1,73 +1,36 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>GOOD TRADE VISION</title>
-  <style>
-    body { font-family: Arial, sans-serif; text-align: center; background: #f9f9f9; }
-    h1 { background: gold; padding: 15px; font-size: 28px; font-weight: bold; }
-    .links a { margin: 10px; padding: 10px 15px; text-decoration: none; color: white; border-radius: 5px; }
-    .telegram { background: #0088cc; }
-    .whatsapp { background: #25d366; }
-    .youtube { background: #ff0000; }
-    input { padding: 8px; width: 50%; margin: 20px 0; }
-    table { border-collapse: collapse; width: 90%; margin: auto; background: white; }
-    th, td { border: 1px solid #ddd; padding: 10px; }
-    th { background: #333; color: white; }
-    td:first-child { font-weight: bold; color: darkblue; }
-    .chart-icon { width: 25px; height: 25px; cursor: pointer; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GOOD TRADE VISION</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            text-align: center;
+        }
+        header {
+            background-color: #222;
+            color: #fff;
+            padding: 15px 0;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        iframe {
+            border: none;
+            width: 100%;
+            height: 90vh;
+        }
+    </style>
 </head>
 <body>
+    <header>📊 GOOD TRADE VISION</header>
 
-  <h1>📊 GOOD TRADE VISION 📊</h1>
-
-  <div class="links">
-    <a class="telegram" href="https://t.me/Goodtradevision" target="_blank">Join Telegram</a>
-    <a class="whatsapp" href="https://wa.me/919838402377" target="_blank">Join WhatsApp</a>
-    <a class="youtube" href="https://www.youtube.com/@GOODTRADEVISION" target="_blank">YouTube Channel</a>
-  </div>
-
-  <input type="text" id="searchBox" placeholder="Search Stock...">
-
-  <table id="stockTable">
-    <tr>
-      <th>Stock Name</th>
-      <th>Buy Date</th>
-      <th>Buy Price</th>
-      <th>Posted On Telegram</th>
-      <th>Chart</th>
-    </tr>
-    <tr>
-      <td>RELIANCE</td>
-      <td>2025-08-09</td>
-      <td>2450</td>
-      <td>2025-08-09 09:30 AM</td>
-      <td><a href="https://www.tradingview.com/chart/?symbol=NSE:RELIANCE" target="_blank">
-        <img src="https://s3.tradingview.com/tv.js" class="chart-icon" alt="Chart">
-      </a></td>
-    </tr>
-    <tr>
-      <td>TCS</td>
-      <td>2025-08-08</td>
-      <td>3750</td>
-      <td>2025-08-08 10:00 AM</td>
-      <td><a href="https://www.tradingview.com/chart/?symbol=NSE:TCS" target="_blank">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/5/5a/TradingView_Logo.png" class="chart-icon" alt="Chart">
-      </a></td>
-    </tr>
-  </table>
-
-  <script>
-    document.getElementById("searchBox").addEventListener("keyup", function() {
-      let filter = this.value.toUpperCase();
-      let rows = document.querySelector("#stockTable").rows;
-      for (let i = 1; i < rows.length; i++) {
-        let firstCol = rows[i].cells[0].textContent.toUpperCase();
-        rows[i].style.display = firstCol.indexOf(filter) > -1 ? "" : "none";
-      }
-    });
-  </script>
+    <iframe 
+        src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTbj9mnIM4v3DzQsqdfvn4P4DwNBuPQ4PIl6KuBnaOoo3CgKPiZekMwAOGuCnC6XoCv1eGb-cJIu2ji/pubhtml?widget=true&amp;headers=false">
+    </iframe>
 
 </body>
 </html>
