@@ -1,131 +1,203 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="hi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GOOD TRADE VISION</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f6f8;
-            margin: 0;
-            padding: 0;
-        }
-        header {
-            background-color: gold;
-            color: black;
-            text-align: center;
-            padding: 20px;
-            font-size: 28px;
-            font-weight: bold;
-        }
-        .links {
-            text-align: center;
-            margin: 15px;
-        }
-        .links a {
-            text-decoration: none;
-            padding: 10px 15px;
-            margin: 5px;
-            border-radius: 5px;
-            color: white;
-        }
-        .telegram { background-color: #0088cc; }
-        .whatsapp { background-color: #25d366; }
-        .youtube { background-color: #ff0000; }
-        #searchBox {
-            width: 90%;
-            padding: 10px;
-            margin: 10px auto;
-            display: block;
-            border: 2px solid #ccc;
-            border-radius: 5px;
-        }
-        table {
-            width: 95%;
-            margin: 10px auto;
-            border-collapse: collapse;
-            background: white;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: center;
-        }
-        th {
-            background-color: #333;
-            color: white;
-        }
-        td:first-child {
-            font-weight: bold;
-            color: #000080;
-        }
-    </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>GOOD TRADE VISION - Stock Signals</title>
+<link rel="icon" href="data:,">
+<style>
+  body{font-family:Arial,Helvetica,sans-serif;margin:0;background:#f5f7fa;color:#222}
+  header{background:#102030;color:#fff;padding:16px;text-align:center}
+  header h1{margin:0;font-size:20px;letter-spacing:1px}
+  .top-buttons{padding:12px;text-align:center}
+  .btn{display:inline-block;margin:6px;padding:10px 14px;border-radius:6px;color:#fff;text-decoration:none;font-weight:600}
+  .telegram{background:#0088cc} .whatsapp{background:#25d366} .youtube{background:#ff0000}
+  .container{max-width:1100px;margin:16px auto;padding:0 12px}
+  #search{width:100%;padding:10px;border-radius:6px;border:1px solid #ccc;font-size:16px;box-sizing:border-box}
+  table{width:100%;border-collapse:collapse;margin-top:12px;background:#fff;border-radius:6px;overflow:hidden}
+  th,td{padding:10px;border-bottom:1px solid #eee;text-align:center;font-size:14px}
+  th{background:#1f4266;color:#fff;font-weight:700}
+  tr:nth-child(even){background:#fbfeff}
+  .chart-cell{width:320px} 
+  @media(max-width:880px){
+    .chart-cell{display:block;width:100%}
+    table,thead,tbody,tr,th,td{display:block}
+    thead{display:none}
+    tr{margin-bottom:12px;border-radius:6px;padding:10px;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,0.02)}
+    td{border:none;text-align:left;padding:6px 10px}
+    td.label{font-weight:700;color:#333;width:40%}
+    td.value{color:#222}
+  }
+  .small-note{font-size:13px;color:#555;margin-top:8px;text-align:center}
+</style>
 </head>
 <body>
 
-<header>GOOD TRADE VISION 📈</header>
+<header>
+  <h1>GOOD TRADE VISION</h1>
+  <div class="small-note">Live signals — data from Google Sheet (auto-update)</div>
+</header>
 
-<div class="links">
-    <a href="https://t.me/Goodtradevision" target="_blank" class="telegram">Join Telegram</a>
-    <a href="https://wa.me/919838402377" target="_blank" class="whatsapp">Join WhatsApp</a>
-    <a href="https://www.youtube.com/@GOODTRADEVISION" target="_blank" class="youtube">Subscribe YouTube</a>
+<div class="top-buttons container">
+  <a class="btn telegram" href="https://t.me/Goodtradevision" target="_blank">Join Telegram</a>
+  <a class="btn whatsapp" href="https://wa.me/919838402377" target="_blank">Join WhatsApp</a>
+  <a class="btn youtube" href="https://www.youtube.com/@GOODTRADEVISION" target="_blank">YouTube Channel</a>
 </div>
 
-<input type="text" id="searchBox" placeholder="Search Stock..." onkeyup="searchTable()">
+<div class="container">
+  <input id="search" placeholder="Search stocks (type name or symbol)..." oninput="filterTable()" />
 
-<table id="stockTable">
+  <table id="stockTable" aria-live="polite">
     <thead>
-        <tr>
-            <th>Stock Name</th>
-            <th>Buy Date</th>
-            <th>Buy Price</th>
-            <th>Posted On Telegram</th>
-            <th>Chart</th>
-        </tr>
+      <tr>
+        <th>Stock Name / Symbol</th>
+        <th>Buy Date</th>
+        <th>Buy Price</th>
+        <th>Posted (Date & Time)</th>
+        <th class="chart-cell">Chart</th>
+      </tr>
     </thead>
-    <tbody id="tableBody">
-        <!-- Google Sheet Data Load Here -->
+    <tbody id="tbody">
+      <tr><td colspan="5">Loading data from Google Sheet…</td></tr>
     </tbody>
-</table>
+  </table>
+  <div class="small-note">Tip: For accurate charts, in your Google Sheet provide symbol as <code>EXCHANGE:SYMBOL</code> (example: <code>NSE:RELIANCE</code>), otherwise NSE: will be assumed.</div>
+</div>
+
+<!-- TradingView widget script (needed to render charts) -->
+<script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
 
 <script>
-    // Google Sheet CSV Link
-    const sheetUrl = "https://docs.google.com/spreadsheets/d/1hZt09JifEOuHTxrRwgCDKbfvW0sCLgLTAZQdGsRJ4rg/pub?output=csv";
+/*
+  Instructions:
+  - This page reads your Google Sheet via the "gviz/tq" JSON endpoint.
+  - If your sheet rows have fewer columns, script will adapt.
+  - If symbol does NOT contain ":" we prefix "NSE:" automatically.
+  - Replace SHEET_ID below if needed (currently set to your sheet).
+*/
 
-    fetch(sheetUrl)
-        .then(res => res.text())
-        .then(csv => {
-            let rows = csv.split("\n").slice(1); // Skip header
-            let tableBody = document.getElementById("tableBody");
-            rows.forEach(row => {
-                let cols = row.split(",");
-                if (cols.length >= 4) {
-                    let chartLink = `https://www.tradingview.com/chart/?symbol=NSE:${cols[0]}`;
-                    let tr = `<tr>
-                        <td>${cols[0]}</td>
-                        <td>${cols[1]}</td>
-                        <td>${cols[2]}</td>
-                        <td>${cols[3]}</td>
-                        <td><a href="${chartLink}" target="_blank">View Chart</a></td>
-                    </tr>`;
-                    tableBody.innerHTML += tr;
-                }
-            });
-        });
+const SHEET_ID = "1hZt09JifEOuHTxrRwgCDKbfvW0sCLgLTAZQdGsRJ4rg";
+const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
 
-    function searchTable() {
-        let filter = document.getElementById("searchBox").value.toUpperCase();
-        let rows = document.getElementById("stockTable").getElementsByTagName("tr");
-        for (let i = 1; i < rows.length; i++) {
-            let td = rows[i].getElementsByTagName("td")[0];
-            if (td) {
-                let txt = td.textContent || td.innerText;
-                rows[i].style.display = txt.toUpperCase().indexOf(filter) > -1 ? "" : "none";
-            }
-        }
+// Helper: parse Google Sheets GViz JSON
+async function fetchSheetJson(url){
+  const res = await fetch(url);
+  const txt = await res.text();
+  // Extract JSON from Google wrapper
+  const jsonText = txt.substring(txt.indexOf('{'), txt.lastIndexOf('}')+1);
+  return JSON.parse(jsonText);
+}
+
+function safeVal(cell){
+  if(!cell) return "";
+  if(cell.f !== undefined) return cell.f; // formatted value
+  if(cell.v !== undefined) return cell.v;
+  return "";
+}
+
+function makeSymbol(raw){
+  if(!raw) return "";
+  raw = String(raw).trim();
+  if(raw.includes(":")) return raw.toUpperCase();
+  // assume NSE if no exchange provided
+  return "NSE:" + raw.toUpperCase();
+}
+
+function shortText(txt){
+  if(!txt) return "";
+  return String(txt);
+}
+
+async function buildTable(){
+  try{
+    const json = await fetchSheetJson(SHEET_URL);
+    const rows = json.table.rows;
+    const tbody = document.getElementById("tbody");
+    tbody.innerHTML = "";
+    if(!rows || rows.length === 0){
+      tbody.innerHTML = "<tr><td colspan='5'>No data found in sheet.</td></tr>";
+      return;
     }
+    // For each row build table row. We'll map first 4 non-empty cells to columns:
+    // [0] Stock Name/Symbol, [1] Buy Date, [2] Buy Price, [3] Posted on Telegram (date/time maybe), extra cells ignored
+    rows.forEach((r, idx) => {
+      const c = r.c || [];
+      const name = safeVal(c[0]) || "";
+      const buyDate = safeVal(c[1]) || "";
+      const buyPrice = safeVal(c[2]) || "";
+      const posted = safeVal(c[3]) || "";
+      const symbolCandidate = name || ""; // assume symbol is in Stock Name column; if you keep separate symbol col, put it there
+      const symbol = makeSymbol(symbolCandidate);
+
+      const tr = document.createElement("tr");
+
+      // Desktop / mobile friendly cells:
+      tr.innerHTML = `
+        <td data-label="Stock Name">${shortText(name)}</td>
+        <td data-label="Buy Date">${shortText(buyDate)}</td>
+        <td data-label="Buy Price">${shortText(buyPrice)}</td>
+        <td data-label="Posted">${shortText(posted)}</td>
+        <td class="chart-cell" data-label="Chart"><div id="chart-${idx}" style="min-width:280px;min-height:200px;margin:0 auto"></div></td>
+      `;
+      tbody.appendChild(tr);
+
+      // Create TradingView widget for this row (safe defaults)
+      // Use small chart, no toolbar to keep page light
+      try{
+        const widgetOptions = {
+          "container_id": `chart-${idx}`,
+          "autosize": true,
+          "symbol": symbol || "NSE:RELIANCE",
+          "interval": "60",
+          "timezone": "Asia/Kolkata",
+          "theme": "light",
+          "style": "1",
+          "locale": "en",
+          "toolbar_bg": "#f1f3f6",
+          "enable_publishing": false,
+          "hide_side_toolbar": true,
+          "allow_symbol_change": false,
+          "details": false,
+          "hotlist": false,
+          "calendar": false,
+          "studies": [],
+          "container_id": `chart-${idx}`
+        };
+        // Delay widget creation slightly to prevent overload for many rows
+        setTimeout(() => {
+          if (window.TradingView && typeof TradingView.widget === "function") {
+            new TradingView.widget(widgetOptions);
+          } else {
+            // if tv.js didn't load yet, try again shortly
+            setTimeout(() => {
+              if (window.TradingView && typeof TradingView.widget === "function") {
+                new TradingView.widget(widgetOptions);
+              } else {
+                document.getElementById(`chart-${idx}`).innerText = "Chart unavailable";
+              }
+            }, 800);
+          }
+        }, 300 + idx*200); // stagger widgets
+      } catch(e){
+        document.getElementById(`chart-${idx}`).innerText = "Chart error";
+      }
+    });
+  } catch(err){
+    console.error(err);
+    document.getElementById("tbody").innerHTML = `<tr><td colspan="5">Error loading sheet. Make sure the sheet is published / shared as Viewer to anyone with link.</td></tr>`;
+  }
+}
+
+function filterTable(){
+  const q = document.getElementById("search").value.trim().toLowerCase();
+  const trs = document.querySelectorAll("#tbody tr");
+  trs.forEach(tr => {
+    const text = tr.innerText.toLowerCase();
+    tr.style.display = text.includes(q) ? "" : "none";
+  });
+}
+
+buildTable();
 </script>
 
 </body>
